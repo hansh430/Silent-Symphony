@@ -19,7 +19,6 @@ public class EnemyHealth : MonoBehaviour
             Die();
         }
     }
-
     private void Die()
     {
         gameObject.GetComponent<Animator>().SetBool("Death", true);
