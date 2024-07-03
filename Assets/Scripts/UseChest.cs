@@ -5,7 +5,8 @@ using UnityEngine;
 public class UseChest : MonoBehaviour
 {
     [SerializeField] private GameObject handUI;
-    [SerializeField] private GameObject objToActivate;
+    [SerializeField] private GameObject[] objectsToActivate;
+    [SerializeField] private GameObject[] objectsToDeActivate;
 
     private bool inReach;
 
@@ -13,7 +14,7 @@ public class UseChest : MonoBehaviour
     void Start()
     {
         handUI.SetActive(false);
-        objToActivate.SetActive(false);
+        ObjectActivatioin(objectsToActivate, false);
     }
 
     void OnTriggerEnter(Collider other)
@@ -40,10 +41,20 @@ public class UseChest : MonoBehaviour
         if (inReach && Input.GetButtonDown("Interact"))
         {
             handUI.SetActive(false);
-            objToActivate.SetActive(true);
+            ObjectActivatioin(objectsToActivate, true);
+            ObjectActivatioin(objectsToDeActivate, false);
             GetComponent<Animator>().SetBool("open", true);
             GetComponent<BoxCollider>().enabled = false;
         }
     }
-
+    private void ObjectActivatioin(GameObject[] obj,bool status)
+    {
+        if (obj != null)
+        {
+            for (int i = 0; i < obj.Length; i++)
+            {
+                obj[i].SetActive(status);
+            }
+        }
+    }
 }

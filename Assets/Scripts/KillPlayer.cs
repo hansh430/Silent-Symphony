@@ -3,10 +3,10 @@ using UnityEngine.SceneManagement;
 
 public class KillPlayer : MonoBehaviour
 {
-    [SerializeField] private string nextSceneName; // Name of the next scene to load
+    [SerializeField] private GameObject gameOverPanel; // Name of the next scene to load
     [SerializeField] private float delay = 0.5f; // Delay in seconds before loading the next scene
     [SerializeField] private GameObject fadeout;
-
+    [SerializeField] private AudioSource audioSource;
     private bool playerInsideTrigger = false;
 
     private void OnTriggerEnter(Collider other)
@@ -15,15 +15,19 @@ public class KillPlayer : MonoBehaviour
         {
             playerInsideTrigger = true;
             fadeout.SetActive(true);
-            Invoke("LoadNextScene", delay);
+            Invoke("GameOver", delay);
         }
     }
 
-    private void LoadNextScene()
+    private void GameOver()
     {
         if (playerInsideTrigger)
         {
-            SceneManager.LoadScene(nextSceneName);
+            gameOverPanel.SetActive(true) ;
+            Time.timeScale = 0f;
+            audioSource.gameObject.SetActive(false);
+            Cursor.visible = true;
+            Cursor.lockState = CursorLockMode.None;
         }
     }
 }

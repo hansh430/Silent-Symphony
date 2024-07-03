@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class MainMenu : MonoBehaviour
+public class GameManager : MonoBehaviour
 {
     public void B_LoadScene()
     {
+        Time.timeScale = 1.0f;
         SceneManager.LoadScene("Game");
     }
 
