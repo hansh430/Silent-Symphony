@@ -10,9 +10,7 @@ public class Door : MonoBehaviour
 
     public GameObject invKey;
     public GameObject fadeFX;
-
-    public string nextSceneName; // Name of the next scene to load
-
+    [SerializeField] private Animator doorAnimator;
 
     private bool inReach;
 
@@ -64,14 +62,20 @@ public class Door : MonoBehaviour
             handUI.SetActive(false);
             UIText.SetActive(false);
             fadeFX.SetActive(true);
+            doorAnimator.enabled = true;
             StartCoroutine(ending());
         }
     }
 
     IEnumerator ending()
     {
-        yield return new WaitForSeconds(.6f);
-        SceneManager.LoadScene(nextSceneName);
+        yield return new WaitForSeconds(1f);
+        SetGameOverType(GameOverType.win);
+        SceneManager.LoadScene("GameOver");
     }
-
+    public void SetGameOverType(GameOverType gameOverType)
+    {
+        PlayerPrefs.SetInt("GameOverType", (int)gameOverType);
+        PlayerPrefs.Save();
+    }
 }
