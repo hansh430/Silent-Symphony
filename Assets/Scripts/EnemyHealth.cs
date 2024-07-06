@@ -2,7 +2,8 @@
 
 public class EnemyHealth : MonoBehaviour
 {
-    [SerializeField] private int maxHealth = 100; 
+    [SerializeField] private int maxHealth = 100;
+    [SerializeField] private Collider interactionCollider;
     private int currentHealth; 
 
     private void Start()
@@ -21,6 +22,7 @@ public class EnemyHealth : MonoBehaviour
     }
     private void Die()
     {
+        interactionCollider.enabled = false;
         gameObject.GetComponent<Animator>().SetBool("Death", true);
     }
 }
