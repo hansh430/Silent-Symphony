@@ -7,7 +7,7 @@ public class UseChest : MonoBehaviour
     [SerializeField] private GameObject handUI;
     [SerializeField] private GameObject[] objectsToActivate;
     [SerializeField] private GameObject[] objectsToDeActivate;
-
+    [SerializeField] private GameObject highlighter;
     private bool inReach;
 
 
@@ -45,6 +45,7 @@ public class UseChest : MonoBehaviour
             ObjectActivatioin(objectsToDeActivate, false);
             GetComponent<Animator>().SetBool("open", true);
             GetComponent<BoxCollider>().enabled = false;
+            highlighter.SetActive(false);
         }
     }
     private void ObjectActivatioin(GameObject[] obj,bool status)
