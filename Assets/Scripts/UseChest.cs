@@ -8,6 +8,7 @@ public class UseChest : MonoBehaviour
     [SerializeField] private GameObject[] objectsToActivate;
     [SerializeField] private GameObject[] objectsToDeActivate;
     [SerializeField] private GameObject highlighter;
+    [SerializeField] private PostionData postionData;
     private bool inReach;
 
 
@@ -15,6 +16,8 @@ public class UseChest : MonoBehaviour
     {
         handUI.SetActive(false);
         ObjectActivatioin(objectsToActivate, false);
+        int index = UnityEngine.Random.Range(0, postionData.SpawnPointPostions.Count);
+        transform.position = postionData.SpawnPointPostions[index];
     }
 
     void OnTriggerEnter(Collider other)
