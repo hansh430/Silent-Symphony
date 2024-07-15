@@ -30,6 +30,8 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] int initialFOV;
     [SerializeField] float cameraZoomSmooth = 1;
 
+    [Header("UI")]
+    [SerializeField] private GameObject pauseScreen;
     private bool isWalking = false;
     private bool isFootstepCoroutineRunning = false;
     private AudioClip[] currentFootstepSounds;
@@ -39,6 +41,7 @@ public class PlayerMovement : MonoBehaviour
     private float rotationY = 0;
     private bool isZoomed = false;
     private bool canMove = true;
+    private bool isPaused;
     CharacterController characterController;
 
     private void Start()
@@ -50,17 +53,44 @@ public class PlayerMovement : MonoBehaviour
     }
     private void Update()
     {
+        PlayerWalkAndMove();
+        CameraZoom();
+        CameraMovement();
+        EnablePauseScreen();
+    }
+
+    private void EnablePauseScreen()
+    {
+        if(Input.GetKeyDown (KeyCode.Escape) && !isPaused)
+        {
+            Time.timeScale = 0;
+            isPaused = true;
+            pauseScreen.SetActive(true);
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+        }
+        else if (Input.GetKeyDown(KeyCode.Escape) && isPaused)
+        {
+            Time.timeScale= 1;
+            isPaused = false;
+            pauseScreen.SetActive(false);
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+        }
+    }
+    private void PlayerWalkAndMove()
+    {
         //walkin/Running
         Vector3 forward = transform.TransformDirection(Vector3.forward);
         Vector3 right = transform.TransformDirection(Vector3.right);
         bool isRunning = Input.GetKey(KeyCode.LeftShift);
-        float curSpeedX = canMove ? (isRunning?runSpeed:walkSpeed)*Input.GetAxis("Vertical") : 0;
-        float curSpeedY = canMove ? (isRunning?runSpeed:walkSpeed)*Input.GetAxis("Horizontal") : 0;
-        float moveDirectionY=moveDirection.y;
-        moveDirection=(forward*curSpeedX) + (right*curSpeedY);
+        float curSpeedX = canMove ? (isRunning ? runSpeed : walkSpeed) * Input.GetAxis("Vertical") : 0;
+        float curSpeedY = canMove ? (isRunning ? runSpeed : walkSpeed) * Input.GetAxis("Horizontal") : 0;
+        float moveDirectionY = moveDirection.y;
+        moveDirection = (forward * curSpeedX) + (right * curSpeedY);
 
         //jump
-        if(Input.GetButton("Jump")&& canMove && characterController.isGrounded)
+        if (Input.GetButton("Jump") && canMove && characterController.isGrounded)
         {
             moveDirection.y = jumpPower;
         }
@@ -71,22 +101,25 @@ public class PlayerMovement : MonoBehaviour
 
         if (!characterController.isGrounded)
         {
-            moveDirection.y-=gravity*Time.deltaTime;
+            moveDirection.y -= gravity * Time.deltaTime;
         }
-        characterController.Move(moveDirection*Time.deltaTime);
+        characterController.Move(moveDirection * Time.deltaTime);
 
-        //camera movement
-        if (canMove)
+
+        // Play footstep sounds when walking
+        if ((curSpeedX != 0f || curSpeedY != 0f) && !isWalking && !isFootstepCoroutineRunning)
         {
-            rotationX -= Input.GetAxis("Mouse Y") * lookSpeed;
-            rotationX = Mathf.Clamp(rotationX, -lookXLimit, lookXLimit);
-            rotationY += Input.GetAxis("Mouse X") * lookSpeed;
-
-            Quaternion targetRotationX = Quaternion.Euler(rotationX, 0, 0);
-            Quaternion targetRotationY = Quaternion.Euler(0,rotationY, 0);
-            playerCam.transform.localRotation = Quaternion.Slerp(playerCam.transform.localRotation, targetRotationX, Time.deltaTime * cameraRotationSmooth);
-            transform.rotation=Quaternion.Slerp(transform.rotation,targetRotationY, Time.deltaTime * cameraRotationSmooth);
+            isWalking = true;
+            StartCoroutine(PlayFootstepSounds(1.3f / (isRunning ? runSpeed : walkSpeed)));
         }
+        else if (curSpeedX == 0f && curSpeedY == 0f)
+        {
+            isWalking = false;
+        }
+    }
+
+    private void CameraZoom()
+    {
         // zoom 
         if (Input.GetButtonDown("Fire2"))
         {
@@ -104,16 +137,21 @@ public class PlayerMovement : MonoBehaviour
         {
             playerCam.GetComponent<Camera>().fieldOfView = Mathf.Lerp(playerCam.fieldOfView, initialFOV, Time.deltaTime * cameraZoomSmooth);
         }
+    }
 
-        // Play footstep sounds when walking
-        if ((curSpeedX != 0f || curSpeedY != 0f) && !isWalking && !isFootstepCoroutineRunning)
+    private void CameraMovement()
+    {
+        //camera movement
+        if (canMove)
         {
-            isWalking = true;
-            StartCoroutine(PlayFootstepSounds(1.3f / (isRunning ? runSpeed : walkSpeed)));
-        }
-        else if (curSpeedX == 0f && curSpeedY == 0f)
-        {
-            isWalking = false;
+            rotationX -= Input.GetAxis("Mouse Y") * lookSpeed;
+            rotationX = Mathf.Clamp(rotationX, -lookXLimit, lookXLimit);
+            rotationY += Input.GetAxis("Mouse X") * lookSpeed;
+
+            Quaternion targetRotationX = Quaternion.Euler(rotationX, 0, 0);
+            Quaternion targetRotationY = Quaternion.Euler(0, rotationY, 0);
+            playerCam.transform.localRotation = Quaternion.Slerp(playerCam.transform.localRotation, targetRotationX, Time.deltaTime * cameraRotationSmooth);
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotationY, Time.deltaTime * cameraRotationSmooth);
         }
     }
 
