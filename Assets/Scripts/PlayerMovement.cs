@@ -47,9 +47,8 @@ public class PlayerMovement : MonoBehaviour
     private void Start()
     {
         characterController = GetComponent<CharacterController>();
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible=false;
-        currentFootstepSounds=woodFootstepSounds;
+        SetCursor(CursorLockMode.Locked, false);
+        currentFootstepSounds =woodFootstepSounds;
     }
     private void Update()
     {
@@ -66,17 +65,20 @@ public class PlayerMovement : MonoBehaviour
             Time.timeScale = 0;
             isPaused = true;
             pauseScreen.SetActive(true);
-            Cursor.lockState = CursorLockMode.None;
-            Cursor.visible = true;
+            SetCursor(CursorLockMode.None,true);
         }
         else if (Input.GetKeyDown(KeyCode.Escape) && isPaused)
         {
             Time.timeScale= 1;
             isPaused = false;
             pauseScreen.SetActive(false);
-            Cursor.lockState = CursorLockMode.Locked;
-            Cursor.visible = false;
+            SetCursor(CursorLockMode.Locked, false);
         }
+    }
+    private void SetCursor(CursorLockMode lockMode, bool isVisible)
+    {
+        Cursor.lockState = lockMode;
+        Cursor.visible = isVisible;
     }
     private void PlayerWalkAndMove()
     {
